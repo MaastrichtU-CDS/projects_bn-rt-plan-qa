@@ -1,13 +1,13 @@
-library(ggplot2)
-library(treemap)
+#library(ggplot2)
+#library(treemap)
 # install.packages("devtools")
 # library(devtools)
 # install_github("easyGgplot2", "kassambara")
-library(easyGgplot2)
+#library(easyGgplot2)
 library(readxl)
 library(dplyr)
-library(gRain)
-library(bnlearn)
+#library(gRain)
+#library(bnlearn)
 
 ####################################################
 # Functions
@@ -97,8 +97,8 @@ data_train <- data[1:split,]
 
 write.csv(data_test, paste(source_folder,"Hugin-BN-RT-QA-MAASTRO_test.csv", sep = "\\"), row.names = FALSE)
 
-data_train <- data_train[-c(1,2,3)]
-data_test_assumed_correct <- data_test[c(5,6,7,8,17)]
+data_train <- data_train[-c(1,2,3)] # Researchnumber, errors, errors_description
+data_test_assumed_correct <- data_test[c(5,6,7,8,17)] # "Anatomic_Tumor_Location","T_Stage","N_Stage","M_Stage","Treatment_Intent"
 data_test_assumed_correct<- replace(data_test_assumed_correct, TRUE, lapply(data_test_assumed_correct, shQuote, type = "cmd"))
 data_test_assumed_correct[data_test_assumed_correct == "\"NULL\""] <- NA
 
@@ -209,6 +209,7 @@ write.csv(data_all_train, na = "<EMPTY>", paste(source_folder, "Hugin-BN-RT-QA-A
 ###########################################
 data_all_test <- rbind(data_UW_test, data_UVM_test)[-c(3,5)] 
 data_all_test <- rbind(data_test[-c(1)], data_all_test)
+data_all_test_no_errors <- data_all_test[data_all_test$errors == 0,]
 write.csv(data_all_test, na = "", quote = FALSE, paste(source_folder, "BN-RT-QA-All-test.csv", sep = "\\"), row.names = FALSE)
 data_all_test <- data_all_test[-c(1,2)]
 data_test_assumed_correct <- data_all_test[c("Anatomic_Tumor_Location","T_Stage","N_Stage","M_Stage","Treatment_Intent")]
@@ -232,6 +233,11 @@ for(i in 1:length(colnames(data_all_test)))
   }
 }
 
+data_all_test_no_errors <- data_all_test_no_errors[-c(1,2)]
+data_all_test_no_errors[data_all_test_no_errors == "NULL"] <- NA
+data_all_test_no_errors[data_all_test_no_errors == ""] <- NA
+data_all_train_and_test_no_errors <- rbind(data_all_train, data_all_test_no_errors)
+write.csv(data_all_train, na = "<EMPTY>", paste(source_folder, "Hugin-BN-RT-QA-Really_All_train.dat", sep = "\\"), row.names = FALSE)
 ###########################################
 # Old script
 ###########################################
